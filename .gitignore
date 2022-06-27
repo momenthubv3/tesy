@@ -1,41 +1,242 @@
-# Compiled Lua sources
-luac.out
+local mychar = game.Players.LocalPlayer.Character
 
-# luarocks build files
-*.src.rock
-*.zip
-*.tar.gz
+local getrawmetatable = getrawmetatable or debug.getmetatable
+local setrawmetatable = setrawmetatable or debug.setmetatable
+--// You need the two functions above
 
-# Object files
-*.o
-*.os
-*.ko
-*.obj
-*.elf
+local Meta = getrawmetatable(game)
+local Me = game:GetService("Players").LocalPlayer
+local New = {}
+for Name, Method in next, Meta do
+New[Name] = Method
+end
+local FakeHumanoid = Instance.new("Humanoid")
+New.__index = newcclosure(function(self, index)
+if index == "WalkSpeed" then
+return 16
+elseif index == "Changed" then
+return Meta.__index(FakeHumanoid, "Changed")
+else
+return Meta.__index(self, index)
+end
+end)
+New.__namecall = newcclosure(function(self, ...)
+local Args = {...}
+local Method = Args[#Args]
+if Method == "GetPropertyChangedSignal" then
+return Meta.__namecall(FakeHumanoid, ...)
+else
+return Meta.__namecall(self, ...)
+end
+end)
 
-# Precompiled Headers
-*.gch
-*.pch
+local HookChar = function(Char)
+if Char then
+setrawmetatable(Char:WaitForChild("Humanoid"), New)
+end
+end
+HookChar(Me.Character)
+Me.CharacterAdded:Connect(HookChar)
 
-# Libraries
-*.lib
-*.a
-*.la
-*.lo
-*.def
-*.exp
 
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
 
-# Executables
-*.exe
-*.out
-*.app
-*.i*86
-*.x86_64
-*.hex
+local Mercury = loadstring(game:HttpGet("https://raw.githubusercontent.com/deeeity/mercury-lib/master/src.lua"))()
+
+local GUI = Mercury:Create{
+    Name = "Welcome",
+    Size = UDim2.fromOffset(600, 400),
+    Theme = Mercury.Themes.Dark,
+    Link = "https://discord.gg/AeNXEtGED6 and https://discord.gg/sAqVcFpJR5 "
+}
+
+GUI:Notification{
+	Title = "Bypassed Anti Walkspeed: Info",
+	Text = "AntiWalkspeed Activated",
+	Duration = 3,
+	Callback = function() end
+}
+
+GUI:Prompt{
+	Followup = false,
+	Title = "Welcome to paid Unamed? hub",
+	Text = "Thanks for buying now injoy",
+}
+
+GUI:Credit{
+	Name = "lobox920 and YAYEET",
+	Description = "lobox920 and YAYEET made the script",
+	Discord = "https://discord.gg/AeNXEtGED6 and https://discord.gg/sAqVcFpJR5"
+}
+
+local Tab = GUI:Tab{
+	Name = "Player",
+	Icon = "rbxassetid://8569322835"
+}
+
+Tab:Button{
+	Name = "Invisible Stand",
+	Description = "Makes your stand Invisible",
+	Callback = function() 
+        game:GetService("ReplicatedStorage").Main.Input:FireServer("Alternate", "Appear", true)
+    end
+}
+
+Tab:Slider{
+	Name = "Walk Speed",
+	Default = 16,
+	Min = 0,
+	Max = 1000,
+	Callback = function(Value)
+        game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = Value
+    end
+}
+
+Tab:Slider{
+	Name = "Jump Power",
+	Default = 16,
+	Min = 0,
+	Max = 1000,
+	Callback = function(Value)
+        game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = Value
+    end
+}
+
+Tab:Toggle{
+	Name = "Anti Time Stop",
+	StartingState = false,
+	Description = "Let you walk in time stop means anti time stop",
+	Callback = function(Value)
+		getgenv().AntiTs = Value
+        while getgenv().AntiTs do
+            if game:GetService("Lighting").TS.Value == true then
+                game:GetService("Lighting").TS.Value = false
+            end
+            wait()
+        end
+	end   
+}
+
+
+local ItemFarm = GUI:Tab{
+	Name = "Item Farm",
+	Icon = "rbxassetid://8569322835"
+}
+
+ItemFarm:Toggle{
+	Name = "AutoUse BankNote",
+	StartingState = false,
+	Description = "AutoUse's BankNote",
+	Callback = function(Value)
+		getgenv().AutoUseBankNote = Value
+        while getgenv().AutoUseBankNote do
+			if game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Banknote") then
+				myhum = game.Players.LocalPlayer.Character.Humanoid
+				myhum:EquipTool(game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("Banknote"))
+				wait(0.1)
+				local vuser = game:GetService("VirtualUser")
+				vuser:CaptureController()
+				vuser:ClickButton1(Vector2.new())
+			end
+            wait(0.5)
+        end
+	end 
+}
+
+ItemFarm:Toggle{
+	Name = "AutoGrab Item",
+	StartingState = false,
+	Description = "Auto Grabs items",
+	Callback = function(Value)
+		getgenv().GrabItem = Value
+        while getgenv().GrabItem do
+			local mychar = game.Players.LocalPlayer.Character
+			for i,v in pairs(workspace:GetChildren()) do
+				if v:IsA('Tool') then
+					mychar:FindFirstChild("Humanoid"):EquipTool(v) 
+				end
+			end
+            wait(3)
+        end
+	end    
+}
+
+ItemFarm:Toggle{
+	Name = "Auto BankNote",
+	StartingState = false,
+	Description = "Auto Grabs BanNote",
+	Callback = function(Value)
+		getgenv().GrabBanknote = Value
+
+        while getgenv().GrabBanknote do
+            for i,v in pairs(workspace:GetChildren()) do
+            	if v:IsA('Tool') then
+            		if v.Name == "Banknote" then
+            			mychar:FindFirstChild("Humanoid"):EquipTool(v) 
+            		end
+            	end
+            end
+			wait(3)
+		end
+	end        
+}
+
+ItemFarm:Toggle{
+	Name = "Auto Arrow",
+	StartingState = false,
+	Description = "Auto Grabs Arrow",
+	Callback = function(Value)
+		getgenv().GrabArrow = Value
+
+        while getgenv().GrabArrow do
+            for i,v in pairs(workspace:GetChildren()) do
+            	if v:IsA('Tool') then
+            		if v.Name == "Arrow" then
+            			mychar:FindFirstChild("Humanoid"):EquipTool(v) 
+            		end
+            	end
+            end
+			wait(3)
+		end 
+	end    
+}
+
+ItemFarm:Toggle{
+	Name = "Auto Arrow",
+	StartingState = false,
+	Description = "Auto Grabs Arrow",
+	Callback = function(Value)
+		getgenv().GrabRokakaka = Value
+		while getgenv().GrabRokakaka do
+            for i,v in pairs(workspace:GetChildren()) do
+            	if v:IsA('Tool') then
+            		if v.Name == "Rokakaka Fruit" then
+            			mychar:FindFirstChild("Humanoid"):EquipTool(v) 
+            		end
+            	end
+            end
+			wait(3)
+		end
+	end
+}
+
+ItemFarm:Toggle{
+	Name = "Auto Frog",
+	StartingState = false,
+	Description = "Auto Grabs Frog",
+	Callback = function(Value)
+		getgenv().GrabFrog = Value
+		while getgenv().GrabFrog do
+            for i,v in pairs(workspace:GetChildren()) do
+            	if v:IsA('Tool') then
+            		if v.Name == "Frog" then
+            			mychar:FindFirstChild("Humanoid"):EquipTool(v) 
+            		end
+            	end
+            end
+			wait(3)
+		end
+	end
+}
+
+
 
